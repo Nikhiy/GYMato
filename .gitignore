@@ -1,51 +1,65 @@
 # =========================
-# Node modules
+# NODE MODULES
 # =========================
 node_modules/
+frontend/node_modules/
 services/**/node_modules/
 
 # =========================
-# Build output
+# BUILD OUTPUT
 # =========================
 dist/
+build/
+frontend/dist/
 services/**/dist/
 
 # =========================
-# Environment variables
+# ENV FILES
 # =========================
 .env
 .env.*
+frontend/.env
 services/**/.env
 
 # =========================
-# Logs
+# LOG FILES
 # =========================
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 
 # =========================
-# OS files
+# OS FILES
 # =========================
 .DS_Store
 Thumbs.db
 
 # =========================
-# TypeScript cache
+# TYPESCRIPT CACHE
 # =========================
 *.tsbuildinfo
 
 # =========================
-# IDE files
+# IDE FILES
 # =========================
 .vscode/
 .idea/
 
 # =========================
-# Optional
+# TEST / COVERAGE
 # =========================
 coverage/
 .tmp/
 .cache/
+
+# =========================
+# VITE
+# =========================
+frontend/.vite/
+
+# =========================
+# MISC
+# =========================
+*.local
