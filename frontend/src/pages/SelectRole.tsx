@@ -4,6 +4,8 @@ import { useState } from "react"
 import axios from "axios"
 import { authService } from "../main"
 
+{/*test comment*/}
+
 type Role="customer" | "rider" | "seller" | null
 const SelectRole = () => {
     const [role, setRole] = useState<Role>(null)
