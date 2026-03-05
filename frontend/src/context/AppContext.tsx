@@ -1,8 +1,9 @@
 import axios from "axios";
 import {createContext, useContext, useEffect, useState, type ReactNode} from "react";
-import { authService } from "../main";
-import type { AppContextType, User } from "../types";
-
+import { authService, restaurantService } from "../main";
+import { type AppContextType, type LocationData, type User } from "../types";
+import { Toaster } from "react-hot-toast";
+import type { ICart } from "../types";
 const appContext=createContext<AppContextType  | undefined>(undefined)
 
 interface AppProviderProps{
@@ -14,7 +15,7 @@ export const AppProvider=({children}:AppProviderProps)=>{
     const [isAuth,setIsAuth]=useState(false)
     const [loading, setLoading] = useState(true)
 
-    const [location, setLocation] = useState(null)
+    const [location, setLocation] = useState<LocationData | null>(null)
     const [loadingLocation, setLoadingLocation] = useState(false)
     const [city, setCity] = useState("Fetching location....");
 
@@ -27,7 +28,7 @@ export const AppProvider=({children}:AppProviderProps)=>{
                 },
                 
             })
-            setUser(data.user);
+            setUser(data);
             setIsAuth(true)
         }
         catch (error){
@@ -37,11 +38,77 @@ export const AppProvider=({children}:AppProviderProps)=>{
             setLoading(false)
         }
     }
+
+    const [cart, setCart] = useState<ICart[]>([])
+    const [subTotal, setSubTotal] = useState(0)
+    const [quantity, setQuantity] = useState(0)
+
+    async function fetchCart(){
+        if(!user || user.role!== "customer"){
+            return
+        } 
+        try{
+            const {data}=await axios.get(`${restaurantService}/api/cart/all`,{
+                headers:{
+                    Authorization:`Bearer ${localStorage.getItem("token")}`
+                }
+            })
+            setCart(data.cart || [])
+            setSubTotal(data.subtotal || 0)
+            setQuantity(data.cartLength)
+        }catch(error){
+            console.log(error)
+        }
+    }
+
     useEffect(()=>{
         fetchUser();
     },[]);
-    return <appContext.Provider value={{isAuth,loading,setIsAuth,setLoading,setUser,user 
-    }}>{children}</appContext.Provider>
+
+    useEffect(()=>{
+        if(user && user.role==='customer'){
+            fetchCart();
+        }
+    },[user])
+
+    useEffect(()=>{
+        if(!navigator.geolocation) return alert("please Allow with location to continue");
+        setLoadingLocation(true);
+
+        navigator.geolocation.getCurrentPosition(async(position)=>{
+            const {latitude,longitude} =position.coords
+            try{
+                const res= await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+                const data=await res.json()
+                setLocation({
+                    latitude,
+                    longitude,
+                    formattedAddress:data.display_name || "current location"
+            })
+
+            setCity(
+                data.address.city || 
+                data.address.town || 
+                data.address.village || "your location"
+            )
+            setLoadingLocation(false)
+            }
+            catch (error){
+                setLocation({
+                    latitude,
+                    longitude,
+                    formattedAddress:"current Location"
+                })
+                setCity("failed to load city")
+                setLoadingLocation(false)
+            }
+        })
+    },[]);
+    return <appContext.Provider value={{isAuth,loading,setIsAuth,setLoading,setUser,user,location,loadingLocation,city,cart,fetchCart,quantity,subTotal
+    }}>
+        {children}
+        <Toaster />
+    </appContext.Provider>
 };
 
 
@@ -52,3 +119,4 @@ export const useAppData=():AppContextType=>{
     }
     return context;
 }
+
