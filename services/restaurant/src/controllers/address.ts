@@ -6,7 +6,7 @@ import Address from "../models/Address.js";
 export const addAddress=trycatch(async(req:AuthenticatedRequest,res)=>{
     const user=req.user;
     if(!user){
-        res.status(401).json({
+       return res.status(401).json({
             message:"Unauthorized Access"
         })
     }
@@ -19,8 +19,9 @@ export const addAddress=trycatch(async(req:AuthenticatedRequest,res)=>{
     }
 
     const newAddress=await Address.create({
-        userId:user?._id.toString(),
-        formattedAdfress,
+        userId:user._id.toString(),
+        mobile,
+        formattedAddress,
         location:{
             type:"Point",
             coordinates:[Number(longitude),Number(latitude)]
@@ -36,7 +37,7 @@ export const addAddress=trycatch(async(req:AuthenticatedRequest,res)=>{
 export const deleteAddress=trycatch(async(req:AuthenticatedRequest,res)=>{
     const user=req.user;
     if(!user){
-        res.status(401).json({
+        return res.status(401).json({
             message:"Unauthorized Access"
         })
     }
@@ -61,3 +62,19 @@ export const deleteAddress=trycatch(async(req:AuthenticatedRequest,res)=>{
         message:"Address deleted succesfully"
     })
 })
+
+
+export const getMyAddresses=trycatch(async(req:AuthenticatedRequest,res)=>{
+    const user=req.user;
+    if(!user){
+        return res.status(401).json({
+            message:"Unauthorized Access"
+        })
+    }
+    const addresses=await Address.find({
+        userId:user._id.toString(), 
+    }).sort({createdAt : -1});
+
+    res.json(addresses)
+})
+

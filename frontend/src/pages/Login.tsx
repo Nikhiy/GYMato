@@ -32,7 +32,7 @@ const Login = () => {
     }
     catch(error){
       console.log(error);
-      toast.error("problem while logginf")
+      toast.error("problem while logging")
       setLoading(false);
     }
   }
@@ -44,7 +44,7 @@ const Login = () => {
   return <div className="flex min-h-screen items-center justify-center bg-white px-4">
     <div className="w-full max-w-sm space-y-6">
       <h1 className="text-center text-3xl font-bold text-[#E23774]">
-        GYMato
+        Dine Flow
       </h1>
       <p className="text-center text-sm text-gray-500">Login or Signup to Continue</p>
       <button onClick={()=>google()} disabled={loading} className="flex w-full items-center justify-center gap-3 rounded-xl border-gray-300 bg-white px-4 py-3"><FcGoogle size={20} />
