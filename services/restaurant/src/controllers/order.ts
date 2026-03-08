@@ -14,15 +14,18 @@ export const createOrder=trycatch(async(req:AuthenticatedRequest,res)=>{
         })
     }
 
-    const {paymentMethod,addressId,distance}=req.body;
+    const {paymentMethod,addressId}=req.body;
     if(!addressId){
         return res.status(400).json({
             message:"Address is required"
         })
     }
 
+
     const address=await Address.findOne({
-        userId:user._id,//this maybe shoul have been (addressId and not user._id)
+        _id:addressId,
+        userId:user._id,
+        //this maybe shoul have been (addressId and not user._id)
         //probably shu=ould add this line (_id:addressId) also
     })
 
@@ -31,6 +34,17 @@ export const createOrder=trycatch(async(req:AuthenticatedRequest,res)=>{
             message:"Address not found"
         })
     }
+
+    const getDistanceKm=(lat1:number,lon1:number,lat2:number,lon2:number):number=>{
+    const R=6371;
+    const dlat=((lat2-lat1)*Math.PI)/180;
+    const dlon=((lon2-lon1)*Math.PI)/180;
+
+    const a=Math.sin(dlat/2)*Math.sin(dlat/2)+Math.cos((lat1*Math.PI)/180)*Math.cos((lat2*Math.PI)/180)*Math.sin(dlon/2)*Math.sin(dlon/2)
+    const c=Math.atan2(Math.sqrt(a),Math.sqrt(1-a))
+    return +(R*c).toFixed(2)
+  };
+
     const cartItems=await Cart.find({
         userId:user._id
     }).
@@ -63,6 +77,13 @@ export const createOrder=trycatch(async(req:AuthenticatedRequest,res)=>{
             message:"Sorry this restaurant is closed"
         })
     }
+
+    const distance=getDistanceKm(
+            address.location.coordinates[1],
+            address.location.coordinates[0],
+            restaurant.autoLocation.coordinates[1],
+            restaurant.autoLocation.coordinates[0]
+          )
 
     let subtotal=0;
     const orderItems=cartItems.map((cart)=>{
