@@ -280,6 +280,10 @@ export const fetchSingleOrder=trycatch(async(req:AuthenticatedRequest,res)=>{
         })
     }
     if(order.userId!==req.user._id.toString()){
-        
+        return res.status(401).json({
+            message:"You are not allowed to view this order",
+        })
     }
+    
 })
+

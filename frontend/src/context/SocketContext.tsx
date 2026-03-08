@@ -47,5 +47,5 @@ return <SocketContext.Provider value={{socket:socketRef.current}}>{children}</So
 
 
 export const useSocket=()=>{
-    useContext(SocketContext)
+   return useContext(SocketContext)
 }

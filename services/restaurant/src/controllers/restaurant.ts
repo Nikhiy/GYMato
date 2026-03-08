@@ -3,7 +3,6 @@ import getBuffer from "../config/datauri.js";
 import { AuthenticatedRequest } from "../middlewares/isAuth.js";
 import trycatch from "../middlewares/trycatch.js";
 import Restaurant from "../models/Restaurant.js";
-import { buffer } from "stream/consumers";
 import jwt from "jsonwebtoken";
 
 
@@ -73,33 +72,40 @@ return res.status(201).json({
 })
 })
 
-export const fetchMyRestaurant=trycatch(async(req:AuthenticatedRequest,res)=>{
-    if(!req.user){
-        return res.status(401).json({
-            message:"please login",
-        })
+export const fetchMyRestaurant = trycatch(
+  async (req: AuthenticatedRequest, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        message: "Please Login",
+      });
     }
-    const restaurant=await Restaurant.findOne({ownerId: req.user._id})
-    if(!restaurant){
-        return res.status(400).json({
-            message:"no restaurant found",
-        })
+    const restaurant = await Restaurant.findOne({ ownerId: req.user._id });
+
+    if (!restaurant) {
+      return res.status(400).json({
+        message: "No Restaurant found",
+      });
     }
-    if(req.user.restaurantId){
-        const token=jwt.sign({
-            user:{
-                ...req.user,
-                restaurant:restaurant._id,
-            },
+
+    if (!req.user.restaurantId) {
+      const token = jwt.sign(
+        {
+          user: {
+            ...req.user,
+            restaurantId: restaurant._id,
+          },
         },
-        process.env.JWT_SEC as string,{
-            expiresIn:"30d",
+        process.env.JWT_SEC as string,
+        {
+          expiresIn: "15d",
         }
-    )
-    return res.json({restaurant,token})
+      );
+
+      return res.json({ restaurant, token });
     }
-    res.json({restaurant});
-}
+
+    res.json({ restaurant });
+  }
 );
 
 
