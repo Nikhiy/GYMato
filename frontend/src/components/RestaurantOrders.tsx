@@ -4,6 +4,7 @@ import { useSocket } from "../context/SocketContext"
 import audio from '../assets/horse.mp3'
 import axios from "axios"
 import { restaurantService } from "../main"
+import OrderCard from "./OrderCard"
 
 const ACTIVE_STATUSES=[
 "placed",
@@ -41,7 +42,7 @@ const RestaurantOrders = ({restaurantId}:{restaurantId:string}) => {
 
     const fetchOrders=async()=>{
         try {
-            const {data}=await axios.get(`${restaurantService}/api/order/${restaurantId}`,{
+            const {data}=await axios.get(`${restaurantService}/api/order/restaurant/${restaurantId}`,{
                 headers:{
                     Authorization:`Bearer ${localStorage.getItem("token")}`
                 }
@@ -110,7 +111,7 @@ const RestaurantOrders = ({restaurantId}:{restaurantId:string}) => {
         {
             activeOrders.length===0 ? <p className="text-sm text-gray-500">No Active Orders</p>:<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {activeOrders.map((order)=>(
-                    <p key={order._id}>{order._id}</p>
+                    <OrderCard key={order._id} order={order} onStatusUpdate={fetchOrders} />
                 ))}
             </div>
         }
@@ -121,7 +122,7 @@ const RestaurantOrders = ({restaurantId}:{restaurantId:string}) => {
         {
             completedOrders.length===0 ? <p className="text-sm text-gray-500">No Completed Orders</p>:<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {completedOrders.map((order)=>(
-                    <p key={order._id}>{order._id}</p>
+                    <OrderCard key={order._id} order={order} onStatusUpdate={fetchOrders} />
                 ))}
             </div>
         }

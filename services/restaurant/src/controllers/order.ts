@@ -284,6 +284,6 @@ export const fetchSingleOrder=trycatch(async(req:AuthenticatedRequest,res)=>{
             message:"You are not allowed to view this order",
         })
     }
-    
+    res.status(200).json(order)
 })
 
