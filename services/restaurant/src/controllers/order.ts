@@ -6,6 +6,7 @@ import { IMenuItem } from "../models/MenuItems.js";
 import Restaurant, { IRestaurant } from "../models/Restaurant.js";
 import Order from "../models/Order.js";
 import axios from "axios";
+import { publishEvent } from "../config/order.publisher.js";
 
 export const createOrder=trycatch(async(req:AuthenticatedRequest,res)=>{
     const user=req.user;
@@ -247,6 +248,20 @@ export const updateOrderStatus=trycatch(async(req:AuthenticatedRequest,res)=>{
     })
 
     //now have to assign riders code left
+
+    if(status==="ready_for_rider"){
+        console.log("Publishing order ready for rider event ",order._id)
+
+        await publishEvent("ORDER_READY_FOR_RIDER",{
+        orderId:order._id.toString(),
+        restaurantId:restaurant._id.toString(),
+        location:restaurant.autoLocation
+    })
+    console.log("Event published succesfully")
+    }
+
+    
+
     res.json({
         message:"order status updated succesfully",
         order
@@ -287,3 +302,36 @@ export const fetchSingleOrder=trycatch(async(req:AuthenticatedRequest,res)=>{
     res.status(200).json(order)
 })
 
+
+export const assignRiderToOrder=trycatch(async(req,res)=>{
+    if(req.headers["x-internal-key"]!==process.env.INTERNAL_SERVICE_KEY){
+        return res.status(403).json({
+            message:"Forbidden"
+        })
+    }
+    const {orderId,riderId,riderName,riderPhone}=req.body
+
+    const order=await Order.findById({orderId})
+    if(order!.riderId!==null){
+        return res.status(400).json({
+            message:"Delivery partner already assigned"
+        })
+    }
+    const orderUpdated=await Order.findOneAndUpdate({_id:orderId,riderId:null},{
+        riderId,
+        riderName,
+        riderPhone,
+        status:"rider_assigned"
+    },{
+        new:true
+    })
+    await axios.post(`${process.env.REALTIME_SERVICE}/api/v1/internal/emit`,{
+        event:"order:rider_assigned",
+        room:`user:${order.userId}`,
+        payload:order,
+    },{
+        headers:{
+            "x-internal-key":process.env.INTERNAL_SERVICE_KEY
+        }
+    })
+})

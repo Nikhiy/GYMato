@@ -123,6 +123,7 @@ export const toggleRiderAvailability=trycatch(async(req:AuthenticatedRequest,res
     rider.lastActiveAt=new Date()
     await rider.save();
     res.json({
-        message: isAvailable? "Rider is now online":"Rider is now offline"
+        message: isAvailable? "Rider is now online":"Rider is now offline",
+        rider
     })
 })
