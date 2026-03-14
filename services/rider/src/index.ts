@@ -5,11 +5,12 @@ import cors from 'cors'
 const app=express()
 import riderRoutes from './routes/rider.js'
 import { connectRabbitMQ } from './config/rabbitmq.js'
+import { startOrderReadyConsumer } from './config/orderReady.consumer.js'
 
 dotenv.config()
 
 await connectRabbitMQ()
-
+startOrderReadyConsumer()
 app.use(express.json());
 app.use(cors());
 app.use("/api/rider",riderRoutes)

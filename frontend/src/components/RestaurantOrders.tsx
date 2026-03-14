@@ -21,6 +21,12 @@ const RestaurantOrders = ({restaurantId}:{restaurantId:string}) => {
     const [audioUnlocked, setAudioUnlocked] = useState(false)
 
     const {socket}=useSocket()
+
+    //changes this to chagpt version
+    
+
+    //till here
+
     const audioRef=useRef<HTMLAudioElement | null>(null)
     useEffect(()=>{
         audioRef.current=new Audio(audio)
@@ -79,6 +85,19 @@ const RestaurantOrders = ({restaurantId}:{restaurantId:string}) => {
             socket.off("order:new",onNewOrder)
         }
     },[socket,audioUnlocked])
+
+
+    useEffect(()=>{
+        if(!socket) return;
+        const onUpdateOrder=()=>{
+            fetchOrders()
+        }
+        socket.on("order:rider_assigned",onUpdateOrder)
+
+        return ()=>{
+            socket.off("order:rider_assigned",onUpdateOrder)
+        }
+    },[socket])
 
     if(loading){
         return <p className="text-gray-500">Loading Orders...</p>

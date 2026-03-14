@@ -1,5 +1,5 @@
 import type { IOrder } from "../types"
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { ORDER_ACTIONS } from "../utils/orderflow";
 import axios from "axios";
 import { restaurantService } from "../main";
@@ -31,10 +31,26 @@ const statusColor=(status:string)=>{
 
 const OrderCard = ({order,onStatusUpdate}:props) => {
     const [loading, setLoading] = useState(false)
+
+    const [retryVisible, setRetryVisible] = useState(false)
+
     const actions=ORDER_ACTIONS[order.status] || []
+
+    useEffect(()=>{
+        if(order.status!=="ready_for_rider"){
+            setRetryVisible(false)
+            return
+        }
+        const timer=setTimeout(()=>{
+            setRetryVisible(true)
+        },10000)
+        return ()=> clearTimeout(timer)
+    },[order.status])
+
     const updateStatus=async(status:string)=>{
         try {
             setLoading(true)
+            setRetryVisible(false)
             await axios.put(`${restaurantService}/api/order/${order._id}`,{status},{
                 headers:{
                     Authorization:`Bearer ${localStorage.getItem("token")}`
@@ -51,7 +67,7 @@ const OrderCard = ({order,onStatusUpdate}:props) => {
 
   return <div className="rounded-xl bg-white p-4 shadow-sm space-y-3">
     <div className="flex justify-between items-center">
-        <p className="text-sm font-medium">Order <div id={order._id.slice(-6)}></div></p>
+      <p className="text-sm font-medium">Order #{order._id.slice(-6)}</p>
         <span className={`rounded-full px-3 py-1 text-sm font-medium ${statusColor(order.status)}`}>
             {order.status.replaceAll("_"," ")}
         </span>
@@ -76,6 +92,8 @@ const OrderCard = ({order,onStatusUpdate}:props) => {
             </div>
         )
     }
+    {order.status==="ready_for_rider" && retryVisible && <div className="pt-2">
+        <button className="w-full rounded-lg border border-[#e23744] py-2 text-xs font-semibold text-[#e23744] hover:bg-red-50 disabled:opacity-50" onClick={()=>updateStatus("ready_for_rider")}>Retry For Rider</button></div>}
   </div>
 }
 
