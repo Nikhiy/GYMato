@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { IRestaurant } from "../types"
-import {useState,useEffect} from "react";
+import {useState} from "react";
 import { restaurantService } from "../main";
 import toast from "react-hot-toast";
 import { BiEdit, BiMapPin, BiSave } from "react-icons/bi";

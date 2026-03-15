@@ -10,7 +10,7 @@ import Account from './pages/Account';
 import { useAppData } from './context/AppContext';
 import Restaurant from './pages/Restaurant';
 import RestaurantPage from './pages/RestaurantPage';
-import Cart from './pages/cart';
+import Cart from './pages/Cart';
 import AddAddressPage from './pages/Address';
 import Checkout from './pages/Checkout';
 import PaymentSuccess from './pages/PaymentSuccess';

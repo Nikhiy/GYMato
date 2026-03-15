@@ -130,9 +130,9 @@ const Checkout = () => {
       setLoadingStripe(true)
       const order=await createOrder("stripe")
       if(!order) return;
-      const {orderId,amount}=order
+      const {orderId}=order
       try{
-        const stripe=await stripePromise;
+        await stripePromise;
         const{data}=await axios.post(`${utilsService}/api/payment/stripe/create`,{
           orderId
         })
