@@ -7,11 +7,12 @@ import { AppProvider } from './context/AppContext.tsx';
 import "leaflet/dist/leaflet.css";
 import { SocketProvider } from './context/SocketContext.tsx';
 
-export const authService='http://localhost:5000'
-export const restaurantService='http://localhost:5001'
-export const utilsService='http://localhost:5002'
-export const realtimeService='http://localhost:5004'
-export const riderService='http://localhost:5005'
+export const authService='https://tomato-auth-latest.onrender.com'
+export const restaurantService='https://tomato-restaurant-1.onrender.com'
+export const utilsService='https://tomato-utils-gn83.onrender.com'
+export const realtimeService='https://realtime-service-waj9.onrender.com'
+export const riderService='https://rider-service-1kr6.onrender.com'
+export const adminService='https://tomato-admin-vw3v.onrender.com'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
