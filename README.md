@@ -1,60 +1,60 @@
-# DineFlow
+# 🍔 DineFlow
 
-A **microservices-based food delivery platform** inspired by Zomato/Swiggy.
-The system supports **user ordering, restaurant management, rider delivery, real-time tracking, and payment processing** using an event-driven architecture.
+A **microservices-based food delivery platform** inspired by Zomato and Swiggy.
+GYMato demonstrates a **scalable backend architecture** using **Node.js microservices, RabbitMQ event-driven communication, real-time updates with Socket.IO, and Docker containerization**.
+
+The platform supports **users ordering food, restaurants managing menus, riders delivering orders, real-time tracking, and secure payment processing**.
 
 ---
 
-# 📌 Overview
+# 📌 Project Overview
 
-GYMato is a **scalable food delivery system** built using **Node.js microservices**, **RabbitMQ messaging**, **Socket.IO real-time updates**, and **Docker containerization**.
+GYMato is designed to simulate a **real-world food delivery platform architecture**.
 
-The system is designed to simulate how real-world food delivery platforms operate by separating responsibilities across independent services.
+Instead of a monolithic backend, the system is built using **multiple independent services** communicating through **RabbitMQ message queues** and **REST APIs**.
 
 Key highlights:
 
 * Microservices architecture
-* Event-driven communication using RabbitMQ
-* Real-time order updates using Socket.IO
-* Secure authentication using JWT
-* Payment integration using Razorpay
-* Dockerized services
-* Cloud-hosted message broker (AWS RabbitMQ)
+* Event-driven communication
+* Real-time order tracking
+* Role-based system (User / Admin / Rider)
+* Razorpay payment integration
+* Docker containerization
+* Cloud-hosted message broker (AWS)
 
 ---
 
-# 🏗 System Architecture
+# 🧠 System Architecture
 
-The platform follows a **microservices architecture** where each service is responsible for a specific domain.
+```mermaid
+flowchart LR
 
-```
-Frontend (React + Vite)
-        │
-        ▼
-   API Requests
-        │
-        ▼
-------------------------------------------------
-Auth Service
-Admin Service
-Restaurant Service
-Rider Service
-Payment Service
-Realtime Service
-------------------------------------------------
-        │
-        ▼
-RabbitMQ Message Broker (AWS Hosted)
-        │
-        ▼
-MongoDB Database
+A[Frontend - React + Vite] --> B[Auth Service]
+A --> C[Restaurant Service]
+A --> D[Rider Service]
+A --> E[Admin Service]
+A --> F[Payment Service]
+
+C --> G[(MongoDB)]
+B --> G
+D --> G
+
+C --> H[RabbitMQ]
+F --> H
+
+H --> D
+H --> I[Realtime Service]
+
+I --> J[Socket.IO]
+J --> A
 ```
 
-Two communication methods are used:
+The system uses **two communication models**:
 
-### 1️⃣ Synchronous Communication
+### Synchronous Communication
 
-HTTP REST APIs between the frontend and backend services.
+Frontend directly calls backend services via **REST APIs**.
 
 Example:
 
@@ -64,9 +64,11 @@ Frontend → Restaurant Service
 Frontend → Rider Service
 ```
 
-### 2️⃣ Asynchronous Communication
+---
 
-Event-driven communication using RabbitMQ.
+### Asynchronous Communication
+
+Services communicate using **RabbitMQ message queues**.
 
 Example:
 
@@ -74,7 +76,7 @@ Example:
 Restaurant Service
       │
       ▼
-Publish "orderReady" event
+Publish orderReady event
       │
       ▼
 RabbitMQ
@@ -85,11 +87,33 @@ Rider Service consumes event
 
 ---
 
-# 🧩 Microservices
+# ⚡ Event Driven Architecture
+
+```mermaid
+flowchart LR
+
+A[Restaurant Service] -->|publish orderCreated| B[RabbitMQ]
+
+B -->|consume| C[Rider Service]
+B -->|consume| D[Realtime Service]
+
+C --> E[Rider Assigned]
+
+D --> F[Socket.IO Event]
+F --> G[Frontend Live Update]
+```
+
+RabbitMQ ensures **loose coupling between services** and improves scalability.
+
+---
+
+# 📦 Microservices
+
+The backend is divided into independent services.
 
 ## 1️⃣ Auth Service
 
-Handles user authentication and authorization.
+Handles authentication and user management.
 
 Features:
 
@@ -114,19 +138,19 @@ auth
 
 ## 2️⃣ Admin Service
 
-Handles administrative operations.
+Manages administrative operations.
 
 Features:
 
-* Manage restaurants
-* Add or remove menu items
-* Manage restaurant listings
+* Add restaurants
+* Manage menu items
+* Admin dashboard
 
 ---
 
 ## 3️⃣ Restaurant Service
 
-Core service responsible for restaurant operations.
+Core business service responsible for restaurant operations.
 
 Features:
 
@@ -136,7 +160,7 @@ Features:
 * Order creation
 * Order event publishing
 
-Events published to RabbitMQ:
+Events published:
 
 ```
 order_created
@@ -152,11 +176,10 @@ Handles delivery partner operations.
 Features:
 
 * Rider authentication
-* Rider dashboard
 * Accept delivery requests
-* Receive events from RabbitMQ when orders are ready
+* Receive order events from RabbitMQ
 
-Event consumed:
+Consumes event:
 
 ```
 orderReady
@@ -166,9 +189,7 @@ orderReady
 
 ## 5️⃣ Realtime Service
 
-Handles real-time communication between backend and frontend.
-
-Implemented using **Socket.IO**.
+Handles real-time updates using **Socket.IO**.
 
 Features:
 
@@ -180,15 +201,15 @@ Features:
 
 ## 6️⃣ Payment Service
 
-Handles payment processing.
+Handles payment processing using **Razorpay**.
 
 Features:
 
-* Razorpay order creation
-* Payment verification
-* Payment event publishing
+* Create Razorpay orders
+* Verify payment signatures
+* Publish payment success events
 
-Workflow:
+Payment flow:
 
 ```
 Checkout
@@ -197,20 +218,16 @@ Create Razorpay order
    ↓
 User completes payment
    ↓
-Verify payment signature
+Verify signature
    ↓
-Publish payment success event
+Publish paymentSuccess event
 ```
 
 ---
 
 # 💻 Frontend
 
-Built with:
-
-* React
-* TypeScript
-* Vite
+The frontend is built using **React + TypeScript + Vite**.
 
 Structure:
 
@@ -225,7 +242,7 @@ frontend
 
 Important pages:
 
-User pages
+### User Pages
 
 ```
 Home
@@ -236,7 +253,7 @@ Orders
 Account
 ```
 
-Admin pages
+### Admin Pages
 
 ```
 Admin Dashboard
@@ -244,7 +261,7 @@ Add Restaurant
 Add Menu Item
 ```
 
-Rider pages
+### Rider Pages
 
 ```
 Rider Dashboard
@@ -254,23 +271,23 @@ Delivery Map
 
 ---
 
-# ⚡ Real-time Order Updates
+# ⚡ Real-Time Order Updates
 
-The system uses **Socket.IO** to push updates to the client.
+```mermaid
+flowchart LR
 
-Example flow:
-
+A[Restaurant prepares order]
+      ↓
+B[RabbitMQ Event]
+      ↓
+C[Realtime Service]
+      ↓
+D[Socket.IO]
+      ↓
+E[Frontend receives update]
 ```
-Restaurant prepares order
-       ↓
-RabbitMQ event
-       ↓
-Realtime Service
-       ↓
-Socket.IO emits event
-       ↓
-Frontend receives update
-```
+
+Socket.IO enables **live order status tracking**.
 
 ---
 
@@ -282,21 +299,52 @@ Steps:
 
 ```
 User places order
-     ↓
+      ↓
 Create Razorpay order
-     ↓
+      ↓
 User completes payment
-     ↓
+      ↓
 Verify payment signature
-     ↓
+      ↓
 Order confirmed
+```
+
+---
+
+# 📊 Order Lifecycle
+
+```mermaid
+sequenceDiagram
+
+participant User
+participant Frontend
+participant RestaurantService
+participant PaymentService
+participant RabbitMQ
+participant RiderService
+participant RealtimeService
+
+User->>Frontend: Select food & checkout
+Frontend->>PaymentService: Create Razorpay order
+PaymentService-->>Frontend: Payment link
+
+User->>PaymentService: Complete payment
+PaymentService->>RestaurantService: Payment verified
+
+RestaurantService->>RabbitMQ: order_created event
+
+RabbitMQ->>RiderService: Notify rider
+RabbitMQ->>RealtimeService: Update status
+
+RealtimeService->>Frontend: Socket update
+Frontend->>User: Show order tracking
 ```
 
 ---
 
 # 🐳 Docker Setup
 
-Each service runs inside its own container.
+Each microservice runs inside its own container.
 
 Services include:
 
@@ -310,7 +358,7 @@ utils
 frontend
 ```
 
-Every service contains a `Dockerfile` to build its container.
+Each service contains a **Dockerfile**.
 
 Example:
 
@@ -327,50 +375,50 @@ utils/Dockerfile
 # ☁️ Cloud Infrastructure
 
 * RabbitMQ hosted on **AWS**
-* Dockerized microservices
-* Event-driven service communication
+* Dockerized services
+* Event-driven architecture
 
 ---
 
 # 📦 Tech Stack
 
-Frontend
+## Frontend
 
 * React
 * TypeScript
 * Vite
 
-Backend
+## Backend
 
 * Node.js
 * Express.js
 * TypeScript
 
-Database
+## Database
 
 * MongoDB
 
-Messaging
+## Messaging
 
 * RabbitMQ
 
-Realtime Communication
+## Realtime Communication
 
 * Socket.IO
 
-Payments
+## Payments
 
 * Razorpay
 
-Cloud
+## Cloud
 
-* AWS (RabbitMQ hosting)
+* AWS
 
-Containerization
+## Containerization
 
 * Docker
 
-Media Storage
+## Media Storage
 
 * Cloudinary
 
@@ -384,53 +432,38 @@ Clone the repository
 git clone https://github.com/Nikhiy/GYMato.git
 ```
 
+Navigate into project
+
+```
+cd GYMato
+```
+
 Install dependencies
 
 ```
 npm install
 ```
 
-Run services
+Run development servers
 
 ```
 npm run dev
 ```
 
-Or using Docker
+---
+
+# 🐳 Run Using Docker
+
+Build containers
 
 ```
 docker build .
+```
+
+Run containers
+
+```
 docker run
-```
-
----
-
-# 📊 Order Flow
-
-```
-User selects food
-      ↓
-Add items to cart
-      ↓
-Checkout
-      ↓
-Razorpay payment
-      ↓
-Payment verified
-      ↓
-Order created
-      ↓
-Restaurant prepares order
-      ↓
-RabbitMQ event (orderReady)
-      ↓
-Rider service receives event
-      ↓
-Rider assigned
-      ↓
-Realtime service updates frontend
-      ↓
-Order delivered
 ```
 
 ---
@@ -439,8 +472,8 @@ Order delivered
 
 * Microservices architecture
 * Event-driven system using RabbitMQ
-* Real-time order updates
-* Role-based access (User / Admin / Rider)
+* Real-time order tracking
+* Role-based system (User / Admin / Rider)
 * Secure authentication
 * Payment gateway integration
 * Dockerized services
@@ -465,5 +498,3 @@ Order delivered
 
 GitHub:
 https://github.com/Nikhiy
-
----
