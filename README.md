@@ -271,20 +271,15 @@ Delivery Map
 
 ---
 
-# ⚡ Real-Time Order Updates
+# ⚡ Real-Time Updates
 
 ```mermaid
 flowchart LR
 
-A[Restaurant prepares order]
-      ↓
-B[RabbitMQ Event]
-      ↓
-C[Realtime Service]
-      ↓
-D[Socket.IO]
-      ↓
-E[Frontend receives update]
+A[Application Created] --> B[Kafka Event]
+B --> C[Notification Service]
+C --> D[Email / Alert]
+D --> E[User Notification]
 ```
 
 Socket.IO enables **live order status tracking**.
