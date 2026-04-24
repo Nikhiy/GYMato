@@ -1,7 +1,7 @@
 # 🍔 DineFlow
 
 A **microservices-based food delivery platform** inspired by Zomato and Swiggy.
-GYMato demonstrates a **scalable backend architecture** using **Node.js microservices, RabbitMQ event-driven communication, real-time updates with Socket.IO, and Docker containerization**.
+DineFlow demonstrates a **scalable backend architecture** using **Node.js microservices, RabbitMQ event-driven communication, real-time updates with Socket.IO, and Docker containerization**.
 
 The platform supports **users ordering food, restaurants managing menus, riders delivering orders, real-time tracking, and secure payment processing**.
 
